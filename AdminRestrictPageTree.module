@@ -1,0 +1,156 @@
+<?php
+
+/**
+* Admin Hide Admin Page Tree for ProcessWire
+*
+* This small autoload module hides the admin page tree from users who have any one of a set of configurable roles. Based
+* on the code from Wanze here: https://processwire.com/talk/topic/6142-hide-page-tree-in-the-admin/#entry60087 with
+* suggestions from Kongondo in reply to a question from Mary.
+*
+* @author Wanze
+* @author Kongondo <kongondo@gmail.com>
+* @author Stephen Dickinson, QBox.co
+*
+* This module copyright (C) 2014 Wanze, Kongondo, Stephen Dickinson.
+* Licensed under GNU/GPL v2.
+*
+* For ProcessWire 2.x
+* Copyright (C) 2011 by Ryan Cramer
+* Licensed under GNU/GPL v2.
+* http://www.processwire.com
+*/
+
+class AdminRestrictPageTree extends WireData implements Module, ConfigurableModule
+{
+    public static function getModuleInfo()
+    {
+		return array(
+			'title'    => 'Admin Restrict Page Tree',
+			'summary'  => 'Hides the page tree from users who have certain role(s).',
+			'author'   => 'Wanze, Kongondo, Netcarver',
+			'version'  => 100,
+			'href'     => 'https://processwire.com/talk/topic/6142-hide-page-tree-in-the-admin/#entry60087',
+			'singular' => true,
+			'autoload' => true,
+		);
+	}
+
+
+    /**
+     *	Initialise the module.
+     *
+     * ProcessWire calls this when the module is loaded. For 'autoload' modules, this will be called.
+     * when ProcessWire's API is ready. As a result, this is a good place to attach hooks.
+     *
+     *	@access public
+     *
+     */
+    public function init()
+    {
+        $this->addHookBefore('ProcessHome::execute', $this, 'hookBeforeProcessHomeExecute');
+        $this->addHookAfter('Page::viewable', $this, 'hookAfterPageViewable');
+    }
+
+
+    static public function getDefaults()
+    {
+        return array(
+            'restricted_roles' => array(),
+            'landing_page'     => 2,
+        );
+    }
+
+
+    public function __construct()
+    {
+        foreach (self::getDefaults() as $k => $v) {
+            $this->$k = $v;
+        }
+    }
+
+
+    /**
+     * Redirect users with custom-role to another page after login
+     */
+    public function hookBeforeProcessHomeExecute(HookEvent $event)
+    {
+        foreach ($this->restricted_roles as $r) {
+            if ($this->user->hasRole($r)) {
+                $this->session->redirect($this->landing_page);
+            }
+        }
+    }
+
+
+
+    /**
+     * Don't give users with custom-role access to Pages page
+     */
+    public function hookAfterPageViewable(HookEvent $event)
+    {
+        $page = $event->object;
+        $user = $this->user;
+
+        if ($page->id != 3) {
+            return;
+        }
+
+        foreach ($this->restricted_roles as $r) {
+            if ($user->hasRole($r)) {
+                $event->return = false;
+            }
+        }
+    }
+
+
+    static public function getModuleConfigInputfields(array $data)
+    {
+		$fields = new InputfieldWrapper();
+		$modules = wire('modules');
+
+        $role_list = self::makeOptions(wire('roles'));
+		$f = $modules->get("InputfieldAsmSelect");
+		$f->name = "restricted_roles";
+		$f->label =  __("Roles that will have the pages tree hidden from them");
+        $f->options = $role_list;
+        if (isset($data['restricted_roles'])) {
+            $f->value = $data['restricted_roles'];
+        } else {
+            $f->value = '';
+        }
+		$fields->add($f);
+
+
+        $page_list = self::makeOptions(wire('pages')->find('id!=3'));
+		$f = $modules->get("InputfieldSelect");
+		$f->name = "landing_page";
+		$f->label =  __("Page to redirect restricted users to.");
+        $f->options = $page_list;
+        if (isset($data['landing_page'])) {
+            $f->value = $data['landing_page'];
+        } else {
+            $f->value = '';
+        }
+		$fields->add($f);
+
+		return $fields;
+	}
+
+
+    static public function makeOptions($wirearray, $include_blank = true)
+    {
+        $options = array();
+        if ($include_blank) {
+            $options[''] = '';
+        }
+
+        foreach ($wirearray as $f) {
+            $name = $f->name;
+            $key  = $name;
+            $key  = wire('sanitizer')->name($name);
+            $options[$key] = $name;
+        }
+
+        return $options;
+    }
+}
