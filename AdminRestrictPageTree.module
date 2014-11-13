@@ -121,7 +121,7 @@ class AdminRestrictPageTree extends WireData implements Module, ConfigurableModu
 		$fields->add($f);
 
 
-        $page_list = self::makeOptions(wire('pages')->find('id!=3'));
+        $page_list = self::makeOptions(wire('pages')->find('template=admin'));
 		$f = $modules->get("InputfieldSelect");
 		$f->name = "landing_page";
 		$f->label =  __("Page to redirect restricted users to.");
