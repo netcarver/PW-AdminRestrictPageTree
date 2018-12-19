@@ -9,6 +9,7 @@
 *
 * @author Wanze
 * @author Kongondo <kongondo@gmail.com>
+* @author Jens Martsch
 * @author Stephen Dickinson, QBox.co
 *
 * This module copyright (C) 2014 Wanze, Kongondo, Stephen Dickinson.
@@ -48,7 +49,9 @@ class AdminRestrictPageTree extends WireData implements Module, ConfigurableModu
     public function init()
     {
         $this->addHookBefore('ProcessHome::execute', $this, 'hookBeforeProcessHomeExecute');
-        $this->addHookAfter('Page::viewable', $this, 'hookAfterPageViewable');
+        if ($this->config->ajax !== true) {
+            $this->addHookAfter('Page::viewable', $this, 'hookAfterPageViewable');
+        }
     }
 
 
