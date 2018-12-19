@@ -29,7 +29,7 @@ class AdminRestrictPageTree extends WireData implements Module, ConfigurableModu
 			'title'    => 'Admin Restrict Page Tree',
 			'summary'  => 'Hides the page tree from users who have certain role(s).',
 			'author'   => 'Wanze, Kongondo, Netcarver',
-			'version'  => 100,
+			'version'  => '1.0.1',
 			'href'     => 'https://processwire.com/talk/topic/6142-hide-page-tree-in-the-admin/#entry60087',
 			'singular' => true,
 			'autoload' => true,
