@@ -97,10 +97,11 @@ class AdminRestrictPageTree extends WireData implements Module, ConfigurableModu
         if ($page->id != 3) {
             return;
         }
-
-        foreach ($this->restricted_roles as $r) {
-            if ($user->hasRole($r)) {
-                $event->return = false;
+        if ($page->id == 3 || $page->id == 8) {
+            foreach ($this->restricted_roles as $r) {
+                if ($user->hasRole($r)) {
+                    $event->return = false;
+                }
             }
         }
     }
