@@ -10,7 +10,8 @@
 * @author Wanze
 * @author Kongondo <kongondo@gmail.com>
 * @author Jens Martsch
-* @author Stephen Dickinson, QBox.co
+* @author Torsten Baldes
+* @author Stephen Dickinson
 *
 * This module copyright (C) 2014 Wanze, Kongondo, Stephen Dickinson.
 * Licensed under GNU/GPL v2.
@@ -29,7 +30,7 @@ class AdminRestrictPageTree extends WireData implements Module, ConfigurableModu
 			'title'    => 'Admin Restrict Page Tree',
 			'summary'  => 'Hides the page tree from users who have certain role(s).',
 			'author'   => 'Wanze, Kongondo, Netcarver',
-			'version'  => '1.0.1',
+			'version'  => '1.0.2',
 			'href'     => 'https://processwire.com/talk/topic/6142-hide-page-tree-in-the-admin/#entry60087',
 			'singular' => true,
 			'autoload' => true,
